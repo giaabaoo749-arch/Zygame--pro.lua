@@ -1,13 +1,23 @@
--- Zygame Hub | Minimalist Version
-local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Lib/Rayfield/main/source'))()
+-- Zygame Hub | Minimalist Version (No Key System)
+local success, Rayfield = pcall(function()
+    return loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Lib/Rayfield/main/source'))()
+end)
+
+if not success then
+    warn("Rayfield failed to load. Check your internet or Executor.")
+    return
+end
 
 local Window = Rayfield:CreateWindow({
-   Name = "Zygame Hub | Lite",
-   KeySystem = true,
-   KeySettings = { Title = "Key System", Note = "Key: zygamevn", Key = {"zygamevn"} }
+    Name = "Zygame Hub | Lite",
+    LoadingTitle = "Initializing...",
+    KeySystem = false
 })
 
--- 1. Fast Attack (Dùng tool:Activate trực tiếp)
+-- Biến Fast Attack
+_G.FastAttack = false
+
+-- Logic Fast Attack (Cực nhẹ)
 task.spawn(function()
     while task.wait(0.1) do
         if _G.FastAttack then
@@ -17,18 +27,22 @@ task.spawn(function()
     end
 end)
 
--- 2. Menu chính
+-- Tạo tab
 local MainTab = Window:CreateTab("Main", "sword")
-MainTab:CreateToggle({Name = "Fast Attack", Callback = function(v) _G.FastAttack = v end})
+MainTab:CreateToggle({
+    Name = "Fast Attack",
+    Callback = function(v) _G.FastAttack = v end
+})
 
 local MoveTab = Window:CreateTab("Movement", "move")
 MoveTab:CreateSlider({
-   Name = "WalkSpeed", Range = {16, 200}, CurrentValue = 16,
-   Callback = function(v)
-      local h = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-      if h then h.WalkSpeed = v end
-   end
+    Name = "WalkSpeed",
+    Range = {16, 200},
+    CurrentValue = 16,
+    Callback = function(v)
+        local h = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+        if h then h.WalkSpeed = v end
+    end
 })
 
--- Xóa bỏ hoàn toàn ESP và các biến không cần thiết để đạt hiệu suất tối đa.
-Rayfield:Notify({Title = "Loaded", Content = "Zygame Hub Lite ready!", Duration = 3})
+Rayfield:Notify({Title = "Zygame Hub", Content = "Loaded successfully!", Duration = 3})
