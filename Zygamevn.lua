@@ -1,48 +1,56 @@
--- Zygame Hub | Minimalist Version (No Key System)
-local success, Rayfield = pcall(function()
-    return loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Lib/Rayfield/main/source'))()
-end)
-
-if not success then
-    warn("Rayfield failed to load. Check your internet or Executor.")
-    return
-end
+-- Zygame Hub | Ultra Light - Final Stable
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Lib/Rayfield/main/source'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "Zygame Hub | Lite",
-    LoadingTitle = "Initializing...",
+    Name = "Zygame Hub | Ultra Light",
+    LoadingTitle = "Zygame Hub...",
     KeySystem = false
 })
 
--- Biến Fast Attack
+-- Variables
 _G.FastAttack = false
+_G.AutoClick = false
+local savedPos = nil
+local player = game.Players.LocalPlayer
 
--- Logic Fast Attack (Cực nhẹ)
+-- Logic Loop (Tối ưu: 1 vòng lặp duy nhất cho mọi hành động)
 task.spawn(function()
-    while task.wait(0.1) do
-        if _G.FastAttack then
-            local tool = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+    while task.wait(0.05) do
+        local char = player.Character
+        -- Fast Attack
+        if _G.FastAttack and char then
+            local tool = char:FindFirstChildOfClass("Tool")
             if tool then tool:Activate() end
+        end
+        -- Auto Click
+        if _G.AutoClick then
+            game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 1)
         end
     end
 end)
 
--- Tạo tab
+-- Main Tab
 local MainTab = Window:CreateTab("Main", "sword")
-MainTab:CreateToggle({
-    Name = "Fast Attack",
-    Callback = function(v) _G.FastAttack = v end
-})
+MainTab:CreateToggle({Name = "Fast Attack", Callback = function(v) _G.FastAttack = v end})
+MainTab:CreateToggle({Name = "Auto Click", Callback = function(v) _G.AutoClick = v end})
 
+-- Movement Tab
 local MoveTab = Window:CreateTab("Movement", "move")
 MoveTab:CreateSlider({
-    Name = "WalkSpeed",
-    Range = {16, 200},
-    CurrentValue = 16,
-    Callback = function(v)
-        local h = game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-        if h then h.WalkSpeed = v end
-    end
+    Name = "WalkSpeed", Range = {16, 200}, CurrentValue = 16,
+    Callback = function(v) if player.Character then player.Character.Humanoid.WalkSpeed = v end end
 })
+
+MoveTab:CreateButton({Name = "Save Position", Callback = function() 
+    if player.Character then savedPos = player.Character.HumanoidRootPart.CFrame end 
+end})
+
+MoveTab:CreateButton({Name = "Teleport", Callback = function() 
+    if savedPos and player.Character then player.Character.HumanoidRootPart.CFrame = savedPos end 
+end})
+
+-- Settings Tab
+local SetTab = Window:CreateTab("Settings", "settings")
+SetTab:CreateButton({Name = "Unlock FPS", Callback = function() setfpscap(999) end})
 
 Rayfield:Notify({Title = "Zygame Hub", Content = "Loaded successfully!", Duration = 3})
